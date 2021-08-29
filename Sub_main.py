@@ -1,24 +1,8 @@
-from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtGui import QMovie
-import sys
-from Database import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.uic import loadUiType
-#from PySide2.QtUiTools import loadUiType
-
-import pyttsx3
-import speech_recognition as sr
-import os
-import time
-import webbrowser
-import datetime
-# import database
+#import database
 import pyttsx3
 from PIL import ImageGrab
 import webbrowser
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5 import QtWidgets, QtGui,QtCore
 from PyQt5.QtGui import QMovie
 import random
 import os
@@ -28,329 +12,319 @@ from selenium import webdriver
 import wikipedia
 from time import strftime
 import time, sys
+import datetime
 import subprocess
 import pyautogui
 import requests
 from tkinter import *
 import psutil
 import requests, json
-import wolframalpha
-import smtplib
-from datetime import datetime
-from playsound import playsound
 
-######################################################################
 
-def alarm():
-    alarm_time = input("Enter the time of alarm to be set:HH:MM:SS\n")
-    alarm_hour=alarm_time[0:2]
-    alarm_minute=alarm_time[3:5]
-    alarm_seconds=alarm_time[6:8]
-    alarm_period = alarm_time[9:11].upper()
-    print("Setting up alarm..")
-    while True:
-        now = datetime.now()
-        current_hour = now.strftime("%I")
-        current_minute = now.strftime("%M")
-        current_seconds = now.strftime("%S")
-        current_period = now.strftime("%p")
-        if(alarm_period==current_period):
-            if(alarm_hour==current_hour):
-                if(alarm_minute==current_minute):
-                    if(alarm_seconds==current_seconds):
-                        print("Wake Up!")
-                        playsound('WhatsApp Audio 2020-12-11 at 1.51.43 PM (1).mpeg')
-                        break
-###########################################################################################
+#db connection
+import mysql.connector
+mydb = mysql.connector.connect(
+  host="localhost",               #hostname
+  user="root",                   # the user who has privilege to the db
+  passwd="milan",               #password for user
+  database="OLIVIA_DB",               #database name
+    auth_plugin = 'mysql_native_password',
 
-try:
-    app = wolframalpha.Client("6JJ3Q4-7KJR3Q7U7L")
-except Exception:
-    print("unstable connection")
+)
+mycursor=mydb.cursor()
+#db connection
+from PySide2.QtUiTools import loadUiType
+
 
 flags = QtCore.Qt.WindowFlags(QtCore.Qt.FramelessWindowHint)
-
-engine = pyttsx3.init('sapi5')
+engine = pyttsx3.init()
 voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[1].id)
-engine.setProperty('rate', 150)
+engine.setProperty('rate',180)
+r = sr.Recognizer()
+
 
 info = ['I am oliVIA, a simple but efficient virtual assistant made by a MILAN',
         'I am your father,rofl', 'I am oliVIA,I said that a ton of times already',
         'I am the one who needs no gun to get respect from no one on the street']
 booting_startup = ['oliVIA Assistant version 1.0 has begun', 'oliVIA at your service',
-                   'Currently starting oliVIA Virtual Assistant', "Loading drivers and modules",
-                   "oliVIA assistant is booting up"]
+           'Currently starting oliVIA Virtual Assistant', "Loading drivers and modules",
+           "oliVIA assistant is booting up"]
 greet = ["hello", "hello there", "Hi,I am oliVIA", "What is up user", "oliVIA at your service",
-         "Greetings organic lifeform", "how can I help you today", "Greetings human", "Your wish is my command",
-         "Hello user", "Hello user,what would you like to do"]  # Possible responses to user greetings
+             "Greetings organic lifeform", "how can I help you today", "Greetings human", "Your wish is my command",
+             "Hello user", "Hello user,what would you like to do"]  # Possible responses to user greetings
 userGreet = ["how can I be of assistance today", "your wish is my command",
              "I am oliVIA,your personal virtual assistant", "how are you today"]
 closing = ['Shutting down', 'Closing oliVIA Assistant', 'Have a nice day'
-                                                        'khatam,tata ,byebye', ]
+           'khatam,tata ,byebye',]
 feelings = ["I have no feelings,I am not sentient like you probably are", "I am feeling like a million bytes",
             "I am feeling functional and ready to serve"]
 musical = ["What are we watching today", "Are gonna to sing some karaoke", "Listening to some music today",
            "Good thing I have my dancing module inside me", "My favorite youtuber is MILAN",
            "Let's start our own channel,whatsay"]
 
-
-def speak(audio):
-    engine.say(audio)
-    engine.runAndWait()
-
-
 def wish():
     hour = int(datetime.datetime.now().hour)
-    if hour >= 0 and hour < 12:
-        speak("Good morning")
-    elif hour >= 12 and hour < 18:
-        speak("Good Afternoon")
+    if hour>=0 and hour <12:
+        engine.say("Good morning")
+    elif hour>=12 and hour<18:
+        engine.say("Good Afternoon")
     else:
-        speak("Good evening")
+        engine.say("Good EVENING")
+
+#detail_start
+engine.say(wish())
+engine.say(random.choice(booting_startup))
+engine.runAndWait()
+engine.say("enter YOUR sweet NAME please")
+engine.runAndWait()
+name = input("Your name:")
+engine.say("enter YOUR MAIL-ID")
+engine.runAndWait()
+Mail_id = input("Your mail-id:")
+engine.say("enter YOUR current location")
+engine.runAndWait()
+location = input("Your current location:")
+sqlFormula="INSERT INTO USER_DETAILS (NAME,MAIL_ID,LOCATION) VALUES (%s, %s, %s)"
+info1=[name,Mail_id,location]
+mycursor.execute(sqlFormula,info1)
+mydb.commit()
+#details_stop
+
+engine.say("Hello " + name + random.choice(userGreet))
+engine.runAndWait()
 
 
-def collect_info():
-    engine.say(random.choice(booting_startup))
+def greet(data):
+    engine.say(random.choice(greet))
     engine.runAndWait()
-    engine.say("enter YOUR sweet NAME please")
+    main()
+def makeJoke():
     engine.runAndWait()
-    name = input("Your name:")
-    engine.say("enter YOUR MAIL-ID")
+    joke1=("wanna hear a joke,nikal lavde")
+    engine.say(joke1)
     engine.runAndWait()
-    Mail_id = input("Your mail-id:")
-    engine.say("enter YOUR current location")
+    main()
+def search(data):
+    webbrowser.open_new_tab("http://google.com/search?q=" + data.split("search", 1)[1])
+   # driver = webdriver.Chrome()
+   # driver.get("http://google.com/search?q=" + data.split("search", 1)[1])
+    wordSearch = data.split("search", 1)[1]
+    sentence = wikipedia.summary(wordSearch, sentences=2)
+    engine.say(sentence)
     engine.runAndWait()
-    location = input("Your current location:")
+    main()
+def youtube(data):
+    engine.say(random.choice(musical))
+    engine.runAndWait()
+    Call_URL = "http://youtube.com"
+    mycmd = r'start chrome /new-tab {}'.format(Call_URL)
+    subprocess.Popen(mycmd, shell=True)
+    # webbrowser.get("C:/Program Files (x86)/Google/Chrome/Application/chrome.exe %s").open("http://youtube.com")
 
-    sqlFormula = "INSERT INTO USER_DETAILS (NAME,MAIL_ID,LOCATION) VALUES (%s, %s, %s)"
-    info1 = [name, Mail_id, location]
-    mycursor.execute(sqlFormula, info1)
-    mydb.commit()
+    sleep(2)
+    main()
+def time(data):
+    current = strftime("%I:%M")
+    engine.say("The current time is " + current)
+    engine.runAndWait()
+    main()
+def tDate(date):
+    dateT = strftime("%B:%d:%A:%Y")
+    engine.say("Today's date is " + dateT)
+    engine.runAndWait()
+    main()
+def Gmail(data):
+    engine.say("Opening Email Client")
+    engine.runAndWait()
+    Call_URL = "http://gmail.com"
+    mycmd = r'start chrome /new-tab {}'.format(Call_URL)
+    subprocess.Popen(mycmd, shell=True)
+    # webbrowser.get("C:/Program Files (x86)/Google/Chrome/Application/chrome.exe %s").open("http://gmail.com")
+    main()
+def Amazon(data):
+    engine.say("Opening Amazon to purchase " + data.split('buy', 1)[1])
+    engine.runAndWait
+    webbrowser.get("C:/Program Files (x86)/Google/Chrome/Application/chrome.exe %s").open(
+        "https://www.amazon.com/s/field-keywords=", data.split('buy', 1)[1])
+    main()
+def Screenshot1():
+    engine.say("Taking screenshot")
+    engine.runAndWait()
+    name = random.randint(1000, 300000)
+    time.sleep(5)
+    ImageGrab.grab().save("screenshot" + str(name), "JPEG")
+    engine.say("Screenshot saved at " + name)
+    engine.runAndWait()
+    print("Screenshot saved at" + name)
+    main()
+def calculate(data):
+    if 'plus' in data:
+        str.replace("plus", "+")
 
+    value1, value2 = (data.split('calculate', 1)[1])
+    answer = value1 + value2
+    engine.say("The answer to that is " + answer)
+    engine.runAndWait()
+def calculator():
+    def add(num1, num2):
+        return num1 + num2
+    def subtract(num1, num2):
+        return num1 - num2
+    def multiply(num1, num2):
+        return num1 * num2
+    def divide(num1, num2):
+        return num1 / num2
+    print("Please select operation -\n 1. Add\n 2. Subtract\n 3. Multiply\n 4. Divide\n")
 
+    # Take input from the user
+    select = int(input("Select operations form 1, 2, 3, 4 :"))
 
+    number_1 = int(input("Enter first number: "))
+    number_2 = int(input("Enter second number: "))
 
+    if select == 1:
+        print(number_1, "+", number_2, "=",
+              add(number_1, number_2))
 
+    elif select == 2:
+        print(number_1, "-", number_2, "=",
+              subtract(number_1, number_2))
 
+    elif select == 3:
+        print(number_1, "*", number_2, "=",
+              multiply(number_1, number_2))
 
-    def execution():
-        sqlFormula=("INSERT INTO user_details (NAME, MAIL-ID, LOCATION) VALUES (%s, %s, %s)")
-        info1=[(name,Mail_id,location)]
-        mycursor.execute(sqlFormula,info1)
-        mydb.commit()
+    elif select == 4:
+        print(number_1, "/", number_2, "=",
+              divide(number_1, number_2))
+    else:
+        print("Invalid input")
+def locate(data):
+    place = data.split('locate', 1)[1]
+    engine.say("Locating " + place)
+    engine.runAndWait()
+    Call_URL = place
+    mycmd = r'start chrome /new-tab {}'.format(Call_URL)
+    subprocess.Popen(mycmd, shell=True)
+    # webbrowser.get("C:/Program Files (x86)/Google/Chrome/Application/chrome.exe %s").open("https://www.google.ca/maps/place/"+place+"/")
+    main()
+def goto(data):
+    where = data.split('go to', 1)[1]
+    Call_URL = where
+    engine.say("Navigating to" + where)
+    engine.runAndWait()
+    mycmd = r'start chrome /new-tab {}'.format(Call_URL)
+    subprocess.Popen(mycmd, shell=True)
+    # webbrowser.get("C:/Program Files (x86)/Google/Chrome/Application/chrome.exe %s").open("http://"+where.strip())
 
+    main()
+def main():
+    with sr.Microphone() as source:
+        sleep(1)
+        print("Say something............")
+        audio = r.listen(source)
+        sleep(1)
+        #print("\n" * 50)
 
+    try:
+        data = r.recognize_google(audio)
+        print("You voice sounded me like:" + data)
+        if data == 'hello':
+            greet()
 
+        elif 'search' in data:
+            engine.say("Opening web browser to search for " + data.split("search", 1)[1])
+            engine.runAndWait()
+            search(data)
+        elif 'YouTube' in data:
+            youtube(data)
+        elif 'time' in data:
+            time(data)
+        elif 'date' in data:
+            tDate(data)
+        elif data == 'shutdown':
+            engine.say(random.choice(closing))
+            #engine.runAndWait()    #system halts for more time if prompted
+            sys.exit()
+        elif 'thank you' in data:
+            engine.say("You are welcome")
+            #engine.runAndWait()  #system halts for more time if prompted
+        elif data == 'oliVIA':
+            engine.say("Yes, I am here")
+        elif data == 'email':
+            Gmail(data)
+        elif 'buy' in data:
+            print("I recommend u to use Amazon")
+            Amazon(data)
+        elif data == 'screenshot':
+            Screenshot1()
+        elif 'calculator' in data:
+            calculator()
+        elif 'locate' in data:
+            locate(data)
+        elif data == 'Notepad':
+            engine.say("Opening notepad")
+            engine.runAndWait()
+            subprocess.Popen('notepad.exe')
 
+            main()
+        elif data == 'change voice':
+            engine.setProperty('voice', voices[random.randrange(0, 2)].id)
+            engine.say("Voice now changed,if not use command again")
+            engine.runAndWait()
+            main()
+        elif data == 'tell me a joke':
+            makeJoke()
+        elif 'go to' in data:
+            goto(data)
+        elif 'type' in data:
+            text = data.split('type', 1)[1]
 
+            pyautogui.typewrite(text)
+            main()
+        elif data == 'who am I':
+            engine.say("You are " + name)
+            engine.runAndWait()
+            main()
+        elif data== 'what is my email':
+            engine.say("your email is "+ Mail_id)
+            engine.runAndWait()
+            main()
+        elif data == 'who are you':
+            engine.say(random.choice(info))
+            engine.runAndWait()
+            main()
+        elif data == 'how are you':
+            engine.say(random.choice(feelings))
+            engine.runAndWait()
+            main()
 
-
-
-
-
-
-
-
-
-
-
-
-class mainT(QThread):
-    def __init__(self):
-        super(mainT, self).__init__()
-
-    def run(self):
-        self.OLIVIA()
-
-    def STT(self):
-        R = sr.Recognizer()
-        with sr.Microphone() as source:
-            print("Listening...........")
-            audio = R.listen(source)
-        try:
-            print("Recognising......")
-            text = R.recognize_google(audio, language='en-in')
-            print(">> ", text)
-        except Exception:
-            speak("Sorry Speak Again")
-            return "None"
-        text = text.lower()
-        return text
-
-    def OLIVIA(self):
-        #wish()
-        #collect_info()
-        #speak("Hello " + name + random.choice(userGreet))
-
-
-        while True:
-
-            self.query = self.STT()
-            if 'good bye' in self.query:
-                sys.exit()
-
-            if 'hello' in self.query:
-                speak(random.choice(greet))
-                #for hai
-            if 'how are you' in self.query:
-                speak(random.choice(feelings))
-                #for feels
-            if 'open google' in self.query:
-                webbrowser.open('www.google.co.in')
-                speak("opening google")
-            if 'open youtube' in self.query:
-                speak(random.choice(musical))
-                speak("opening youtube")
-                webbrowser.open("www.youtube.com")
-            if 'play music' in self.query:
-                speak("playing music from pc")
-                self.music_dir = "./music"
-                self.musics = os.listdir(self.music_dir)
-                os.startfile(os.path.join(self.music_dir, self.musics[0]))
-            if 'calculate' in self.query:
-                def add(num1, num2):
-                    return num1 + num2
-                def subtract(num1, num2):
-                    return num1 - num2
-                def multiply(num1, num2):
-                    return num1 * num2
-                def divide(num1, num2):
-                    return num1 / num2
-
-                print("Please select operation -\n 1. Add\n 2. Subtract\n 3. Multiply\n 4. Divide\n")
-                select = int(input("Select operations form 1, 2, 3, 4 :"))
-
-                number_1 = int(input("Enter first number: "))
-                number_2 = int(input("Enter second number: "))
-
-                if select == 1:
-                    print(number_1, "+", number_2, "=",
-                          add(number_1, number_2))
-                elif select == 2:
-                    print(number_1, "-", number_2, "=",
-                          subtract(number_1, number_2))
-                elif select == 3:
-                    print(number_1, "*", number_2, "=",
-                          multiply(number_1, number_2))
-                elif select == 4:
-                    print(number_1, "/", number_2, "=",
-                          divide(number_1, number_2))
-                else:
-                    print("Invalid input")
-            if 'search' in self.query:
-                speak("Opening web browser to search for " + self.query.split("search", 1)[1])
-
-                webbrowser.open_new_tab("http://google.com/search?q=" + self.query.split("search", 1)[1])
-                # driver = webdriver.Chrome()
-                # driver.get("http://google.com/search?q=" + data.split("search", 1)[1])
-                wordSearch = self.query.split("search", 1)[1]
-                sentence = wikipedia.summary(wordSearch, sentences=2)
-                engine.say(sentence)
-                engine.runAndWait()
-            if 'time' in self.query:
-                current = strftime("%I:%M")
-                speak("The current time is " + current)
-            if 'date' in self.query:
-                dateT = strftime("%B:%d:%A:%Y")
-                speak("Today's date is " + dateT)
-            if 'make a joke' in self.query:
-                speak("playing a random joke")
-                joke1 = ("Hear about the new restaurant called Karma, There’s no menu,  You get what you deserve.")
-                speak(joke1)
-                #if 'mail' in self.query:
-                 #   speak("Opening Email Client")
-                  #  Call_URL = "http://gmail.com"
-                   # mycmd = r'start chrome /new-tab {}'.format(Call_URL)
-                    #subprocess.Popen(mycmd, shell=True)
-            if 'Amazon' in self.query:                #not working ...check later on
-                speak("Opening Amazon to purchase ")
-                mycmd = r'start chrome /new-tab {}'.format(Call_URL)
-                subprocess.Popen(mycmd, shell=True)
-            if 'screenshot' in self.query:
-                speak("Taking screenshot")
-                name1 = random.randint(1000, 300000)
-                ImageGrab.grab().save("screenshot" + str(name1), "JPEG")
-                speak("Screenshot saved as " + name1)
-            if 'who am I' in self.query:
-                engine.say("You are " + name)
-                #says user name
-            if 'change voice' in self.query:
-                engine.setProperty('voice', voices[random.randrange(0, 2)].id)
-                speak("Voice now changed,if not use command again")
-            if 'notepad' in self.query:
-                speak("Opening notepad")
-                subprocess.Popen('notepad.exe')
-            if 'shut down' in self.query:
-                speak(random.choice(closing))
-                sys.exit()
-            if 'thank you' in self.query:
-                speak("You are welcome")
-                #for closing
-            if 'olivia' in self.query:
-                speak("Yes, I am here")
-                #says her name
-            if 'send email' in self.query:
-                try:
-                    server=smtplib.SMTP('smtp.gmail.com',587)
-                    #server.ehlo()
-                    server.starttls()
-                    server.login("mypersonalinfo007@gmail.com","qwerty1@$")
-                    speak("login success")
-                    dest=input("enter destination")
-                    message=input("enter message")
-                    server.sendmail("mypersonalinfo007@gmail.com", dest,message)
-                    server.close()
-                    speak("email sent successfully")
-                except:
-                    speak("sending email failed")
-            if 'alarm' in self.query:
-                alarm()
-                #need to check this ,it is not working
-            if 'throw a dice' in self.query:
-                while True:
-                    speak('press 1 for throwing a dice')
-                    speak('press 2 to exit ')
-                    user = int(input("1 or 2: "))
-                    if user == 1:
-                        number = random.randint(1, 12)
-                        speak(number)
-                    else:
-                        break
-                #throw dice
-            if 'generate password' in self.query:
-                passlen = int(input("enter the length of password"))
-                s = "abcdefghijklmnopqrstuvwxyz01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()?"
-                p = "".join(random.sample(s, passlen))
-                print(p)
+        else:
+            main()
 
 
 
+    except sr.UnknownValueError:
+        sleep(2)
+        engine.say("MILAN didnot create me to waste time, so please do say something...")
+        engine.runAndWait()
+        main()
+    except sr.RequestError as e:
+        print("Could not request results from internet;{0}".format(e))
+        main()
 
 
+FROM_MAIN,_ = loadUiType(os.path.join(os.path.dirname(__file__),"./scifi.ui"))
 
-
-
-
-
-
-
-
-
-
-
-
-FROM_MAIN, _ = loadUiType(os.path.join(os.path.dirname(__file__), "./scifi.ui"))
-
-
-class Main(QMainWindow, FROM_MAIN):
-    def __init__(self, parent=None):
-        super(Main, self).__init__(parent)
+class Main(QMainWindow,FROM_MAIN):
+    def __init__(self,parent=None):
+        super(Main,self).__init__(parent)
         self.setupUi(self)
-        self.setFixedSize(1920, 1080)
+        self.setFixedSize(1920,1080)
         self.label_7 = QLabel
         self.exitB.setStyleSheet("background-image:url(./lib/exit - Copy.png);\n"
-                                 "border:none;")
+        "border:none;")
         self.exitB.clicked.connect(self.close)
         self.setWindowFlags(flags)
         Dspeak = mainT()
@@ -360,18 +334,16 @@ class Main(QMainWindow, FROM_MAIN):
         self.label_7.start()
 
         self.ts = time.strftime("%A, %d %B")
-        # self.m = collect_info()
 
         Dspeak.start()
         self.label.setPixmap(QPixmap("./lib/tuse.png"))
-        self.label_5.setText("<font size=8 color='white'>" + self.ts + "</font>")
-        self.label_5.setFont(QFont(QFont('Acens', 8)))
-
-    # self.label_3.setText("<font size=15 color='white'>"+self.m+"</font>")
-    # self.label_3.setFont(QFont(QFont('Acens',15)))
+        self.label_5.setText("<font size=8 color='white'>"+self.ts+"</font>")
+        self.label_5.setFont(QFont(QFont('Acens',8)))
 
 
 app = QtWidgets.QApplication(sys.argv)
 main = Main()
 main.show()
 exit(app.exec_())
+
+main()

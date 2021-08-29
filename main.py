@@ -7,7 +7,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.uic import loadUiType
 #from PySide2.QtUiTools import loadUiType
-
+import scifi
 import pyttsx3
 import speech_recognition as sr
 import os
@@ -99,22 +99,22 @@ def collect_info():
     engine.runAndWait()
     location = input("Your current location:")
 
-    sqlFormula = "INSERT INTO USER_DETAILS (NAME,MAIL_ID,LOCATION) VALUES (%s, %s, %s)"
-    info1 = [name, Mail_id, location]
-    mycursor.execute(sqlFormula, info1)
+    #sqlFormula = "INSERT INTO USER_DETAILS (NAME,MAIL_ID,LOCATION) VALUES (%s, %s, %s)"
+    #info1 = [name, Mail_id, location]
+    #mycursor.execute(sqlFormula, info1)
+    #mydb.commit()
+
+
+
+
+
+
+
+def execution():
+    sqlFormula=("INSERT INTO user_details (NAME, MAIL-ID, LOCATION) VALUES (%s, %s, %s)")
+    info1=[(name,Mail_id,location)]
+    mycursor.execute(sqlFormula,info1)
     mydb.commit()
-
-
-
-
-
-
-
-    def execution():
-        sqlFormula=("INSERT INTO user_details (NAME, MAIL-ID, LOCATION) VALUES (%s, %s, %s)")
-        info1=[(name,Mail_id,location)]
-        mycursor.execute(sqlFormula,info1)
-        mydb.commit()
 
 
 
@@ -155,7 +155,7 @@ class mainT(QThread):
         return text
 
     def OLIVIA(self):
-        #wish()
+        wish()
         #collect_info()
         #speak("Hello " + name + random.choice(userGreet))
 
@@ -165,7 +165,8 @@ class mainT(QThread):
             self.query = self.STT()
             if 'good bye' in self.query:
                 sys.exit()
-
+            if 'king of the jungle' in self.query:
+                speak("Milan also called as the indian lion is also called the king of the jungle. ")
             if 'hello' in self.query:
                 speak(random.choice(greet))
                 #for hai
