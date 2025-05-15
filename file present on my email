@@ -1,0 +1,332 @@
+import database
+import pyttsx3
+from PIL import ImageGrab
+import webbrowser
+from PyQt5 import QtWidgets, QtGui,QtCore
+from PyQt5.QtGui import QMovie
+import random
+import os
+import speech_recognition as sr
+from time import sleep
+from selenium import webdriver
+import wikipedia
+from time import strftime
+import time, sys
+import datetime
+import subprocess
+import pyautogui
+import requests
+from tkinter import *
+import psutil
+import requests, json
+
+#db connection
+import mysql.connector
+mydb = mysql.connector.connect(
+host=&quot;localhost&quot;, #hostname
+user=&quot;root&quot;, # the user who has privilege to the db
+passwd=&quot;milan&quot;, #password for user
+database=&quot;OLIVIA_DB&quot;, #database name
+auth_plugin = &#39;mysql_native_password&#39;,
+)
+mycursor=mydb.cursor()
+#db connection
+
+flags = QtCore.Qt.WindowFlags(QtCore.Qt.FramelessWindowHint)
+engine = pyttsx3.init()
+voices = engine.getProperty(&#39;voices&#39;)
+engine.setProperty(&#39;voice&#39;, voices[1].id)
+engine.setProperty(&#39;rate&#39;,180)
+r = sr.Recognizer()
+
+info = [&#39;I am oliVIA, a simple but efficient virtual assistant made by a MILAN&#39;,
+&#39;I am your father,rofl&#39;, &#39;I am oliVIA,I said that a ton of times already&#39;,
+&#39;I am the one who needs no gun to get respect from no one on the street&#39;]
+
+booting_startup = [&#39;oliVIA Assistant version 1.0 has begun&#39;, &#39;oliVIA at your service&#39;,
+&#39;Currently starting oliVIA Virtual Assistant&#39;, &quot;Loading drivers and modules&quot;,
+&quot;oliVIA assistant is booting up&quot;]
+greet = [&quot;hello&quot;, &quot;hello there&quot;, &quot;Hi,I am oliVIA&quot;, &quot;What is up user&quot;, &quot;oliVIA at your service&quot;,
+&quot;Greetings organic lifeform&quot;, &quot;how can I help you today&quot;, &quot;Greetings human&quot;, &quot;Your wish is
+my command&quot;,
+&quot;Hello user&quot;, &quot;Hello user,what would you like to do&quot;] # Possible responses to user greetings
+userGreet = [&quot;how can I be of assistance today&quot;, &quot;your wish is my command&quot;,
+&quot;I am oliVIA,your personal virtual assistant&quot;, &quot;how are you today&quot;]
+closing = [&#39;Shutting down&#39;, &#39;Closing oliVIA Assistant&#39;, &#39;Have a nice day&#39;
+&#39;khatam,tata ,byebye&#39;,]
+feelings = [&quot;I have no feelings,I am not sentient like you probably are&quot;, &quot;I am feeling like a million
+bytes&quot;,
+&quot;I am feeling functional and ready to serve&quot;]
+musical = [&quot;What are we watching today&quot;, &quot;Are gonna to sing some karaoke&quot;, &quot;Listening to some
+music today&quot;,
+&quot;Good thing I have my dancing module inside me&quot;, &quot;My favorite youtuber is MILAN&quot;,
+&quot;Let&#39;s start our own channel,whatsay&quot;]
+def wish():
+hour = int(datetime.datetime.now().hour)
+if hour&gt;=0 and hour &lt;12:
+engine.say(&quot;Good morning&quot;)
+elif hour&gt;=12 and hour&lt;18:
+engine.say(&quot;Good Afternoon&quot;)
+else:
+engine.say(&quot;Good EVENING&quot;)
+#detail_start
+engine.say(wish())
+engine.say(random.choice(booting_startup))
+engine.runAndWait()
+engine.say(&quot;enter YOUR sweet NAME please&quot;)
+engine.runAndWait()
+name = input(&quot;Your name:&quot;)
+engine.say(&quot;enter YOUR MAIL-ID&quot;)
+engine.runAndWait()
+Mail_id = input(&quot;Your mail-id:&quot;)
+engine.say(&quot;enter YOUR current location&quot;)
+engine.runAndWait()
+location = input(&quot;Your current location:&quot;)
+sqlFormula=&quot;INSERT INTO USER_DETAILS (NAME,MAIL_ID,LOCATION) VALUES (%s, %s, %s)&quot;
+info1=[name,Mail_id,location]
+mycursor.executemany(sqlFormula,info1)
+mydb.commit()
+#details_stop
+engine.say(&quot;Hello &quot; + name + random.choice(userGreet))
+
+engine.runAndWait()
+
+def greet(data):
+engine.say(random.choice(greet))
+engine.runAndWait()
+main()
+def makeJoke():
+engine.runAndWait()
+joke1=(&quot;wanna hear a joke,nikal lavde&quot;)
+engine.say(joke1)
+engine.runAndWait()
+main()
+def search(data):
+webbrowser.open_new_tab(&quot;http://google.com/search?q=&quot; + data.split(&quot;search&quot;, 1)[1])
+# driver = webdriver.Chrome()
+# driver.get(&quot;http://google.com/search?q=&quot; + data.split(&quot;search&quot;, 1)[1])
+wordSearch = data.split(&quot;search&quot;, 1)[1]
+sentence = wikipedia.summary(wordSearch, sentences=2)
+engine.say(sentence)
+engine.runAndWait()
+main()
+def youtube(data):
+engine.say(random.choice(musical))
+engine.runAndWait()
+Call_URL = &quot;http://youtube.com&quot;
+mycmd = r&#39;start chrome /new-tab {}&#39;.format(Call_URL)
+subprocess.Popen(mycmd, shell=True)
+# webbrowser.get(&quot;C:/Program Files (x86)/Google/Chrome/Application/chrome.exe
+%s&quot;).open(&quot;http://youtube.com&quot;)
+sleep(2)
+main()
+def time(data):
+current = strftime(&quot;%I:%M&quot;)
+engine.say(&quot;The current time is &quot; + current)
+engine.runAndWait()
+main()
+def tDate(date):
+dateT = strftime(&quot;%B:%d:%A:%Y&quot;)
+engine.say(&quot;Today&#39;s date is &quot; + dateT)
+engine.runAndWait()
+main()
+def Gmail(data):
+engine.say(&quot;Opening Email Client&quot;)
+engine.runAndWait()
+Call_URL = &quot;http://gmail.com&quot;
+mycmd = r&#39;start chrome /new-tab {}&#39;.format(Call_URL)
+
+subprocess.Popen(mycmd, shell=True)
+# webbrowser.get(&quot;C:/Program Files (x86)/Google/Chrome/Application/chrome.exe
+%s&quot;).open(&quot;http://gmail.com&quot;)
+main()
+def Amazon(data):
+engine.say(&quot;Opening Amazon to purchase &quot; + data.split(&#39;buy&#39;, 1)[1])
+engine.runAndWait
+webbrowser.get(&quot;C:/Program Files (x86)/Google/Chrome/Application/chrome.exe %s&quot;).open(
+&quot;https://www.amazon.com/s/field-keywords=&quot;, data.split(&#39;buy&#39;, 1)[1])
+main()
+def Screenshot1():
+engine.say(&quot;Taking screenshot&quot;)
+engine.runAndWait()
+name = random.randint(1000, 300000)
+time.sleep(5)
+ImageGrab.grab().save(&quot;screenshot&quot; + str(name), &quot;JPEG&quot;)
+engine.say(&quot;Screenshot saved at &quot; + name)
+engine.runAndWait()
+print(&quot;Screenshot saved at&quot; + name)
+main()
+def calculate(data):
+if &#39;plus&#39; in data:
+str.replace(&quot;plus&quot;, &quot;+&quot;)
+value1, value2 = (data.split(&#39;calculate&#39;, 1)[1])
+answer = value1 + value2
+engine.say(&quot;The answer to that is &quot; + answer)
+engine.runAndWait()
+def calculator():
+def add(num1, num2):
+return num1 + num2
+def subtract(num1, num2):
+return num1 - num2
+def multiply(num1, num2):
+return num1 * num2
+def divide(num1, num2):
+return num1 / num2
+print(&quot;Please select operation -\n 1. Add\n 2. Subtract\n 3. Multiply\n 4. Divide\n&quot;)
+# Take input from the user
+select = int(input(&quot;Select operations form 1, 2, 3, 4 :&quot;))
+number_1 = int(input(&quot;Enter first number: &quot;))
+number_2 = int(input(&quot;Enter second number: &quot;))
+if select == 1:
+print(number_1, &quot;+&quot;, number_2, &quot;=&quot;,
+add(number_1, number_2))
+
+elif select == 2:
+print(number_1, &quot;-&quot;, number_2, &quot;=&quot;,
+subtract(number_1, number_2))
+elif select == 3:
+print(number_1, &quot;*&quot;, number_2, &quot;=&quot;,
+multiply(number_1, number_2))
+elif select == 4:
+print(number_1, &quot;/&quot;, number_2, &quot;=&quot;,
+divide(number_1, number_2))
+else:
+print(&quot;Invalid input&quot;)
+def locate(data):
+place = data.split(&#39;locate&#39;, 1)[1]
+engine.say(&quot;Locating &quot; + place)
+engine.runAndWait()
+Call_URL = place
+mycmd = r&#39;start chrome /new-tab {}&#39;.format(Call_URL)
+subprocess.Popen(mycmd, shell=True)
+# webbrowser.get(&quot;C:/Program Files (x86)/Google/Chrome/Application/chrome.exe
+%s&quot;).open(&quot;https://www.google.ca/maps/place/&quot;+place+&quot;/&quot;)
+main()
+def goto(data):
+where = data.split(&#39;go to&#39;, 1)[1]
+Call_URL = where
+engine.say(&quot;Navigating to&quot; + where)
+engine.runAndWait()
+mycmd = r&#39;start chrome /new-tab {}&#39;.format(Call_URL)
+subprocess.Popen(mycmd, shell=True)
+# webbrowser.get(&quot;C:/Program Files (x86)/Google/Chrome/Application/chrome.exe
+%s&quot;).open(&quot;http://&quot;+where.strip())
+main()
+def main():
+with sr.Microphone() as source:
+sleep(1)
+print(&quot;Say something............&quot;)
+audio = r.listen(source)
+sleep(1)
+#print(&quot;\n&quot; * 50)
+try:
+data = r.recognize_google(audio)
+print(&quot;You voice sounded me like:&quot; + data)
+if data == &#39;hello&#39;:
+greet()
+
+elif &#39;search&#39; in data:
+engine.say(&quot;Opening web browser to search for &quot; + data.split(&quot;search&quot;, 1)[1])
+engine.runAndWait()
+search(data)
+elif &#39;YouTube&#39; in data:
+youtube(data)
+elif &#39;time&#39; in data:
+time(data)
+elif &#39;date&#39; in data:
+tDate(data)
+elif data == &#39;shutdown&#39;:
+engine.say(random.choice(closing))
+#engine.runAndWait() #system halts for more time if prompted
+sys.exit()
+elif &#39;thank you&#39; in data:
+engine.say(&quot;You are welcome&quot;)
+#engine.runAndWait() #system halts for more time if prompted
+elif data == &#39;oliVIA&#39;:
+engine.say(&quot;Yes, I am here&quot;)
+elif data == &#39;email&#39;:
+Gmail(data)
+elif &#39;buy&#39; in data:
+print(&quot;I recommend u to use Amazon&quot;)
+Amazon(data)
+elif data == &#39;screenshot&#39;:
+Screenshot1()
+elif &#39;calculator&#39; in data:
+calculator()
+elif &#39;locate&#39; in data:
+locate(data)
+elif data == &#39;Notepad&#39;:
+engine.say(&quot;Opening notepad&quot;)
+engine.runAndWait()
+subprocess.Popen(&#39;notepad.exe&#39;)
+main()
+elif data == &#39;change voice&#39;:
+engine.setProperty(&#39;voice&#39;, voices[random.randrange(0, 2)].id)
+engine.say(&quot;Voice now changed,if not use command again&quot;)
+engine.runAndWait()
+main()
+elif data == &#39;tell me a joke&#39;:
+makeJoke()
+elif &#39;go to&#39; in data:
+goto(data)
+elif &#39;type&#39; in data:
+text = data.split(&#39;type&#39;, 1)[1]
+
+pyautogui.typewrite(text)
+main()
+elif data == &#39;who am I&#39;:
+engine.say(&quot;You are &quot; + name)
+engine.runAndWait()
+main()
+elif data== &#39;what is my email&#39;:
+engine.say(&quot;your email is &quot;+email)
+engine.runAndWait()
+main()
+elif data == &#39;who are you&#39;:
+engine.say(random.choice(info))
+engine.runAndWait()
+main()
+elif data == &#39;how are you&#39;:
+engine.say(random.choice(feelings))
+engine.runAndWait()
+main()
+else:
+main()
+
+except sr.UnknownValueError:
+sleep(2)
+engine.say(&quot;MILAN didnot create me to waste time, so please do say something...&quot;)
+engine.runAndWait()
+main()
+except sr.RequestError as e:
+print(&quot;Could not request results from internet;{0}&quot;.format(e))
+main()
+
+FROM_MAIN,_ = loadUiType(os.path.join(os.path.dirname(__file__),&quot;./scifi.ui&quot;))
+class Main(QMainWindow,FROM_MAIN):
+def __init__(self,parent=None):
+super(Main,self).__init__(parent)
+self.setupUi(self)
+self.setFixedSize(1920,1080)
+self.label_7 = QLabel
+self.exitB.setStyleSheet(&quot;background-image:url(./lib/exit - Copy.png);\n&quot;
+&quot;border:none;&quot;)
+self.exitB.clicked.connect(self.close)
+self.setWindowFlags(flags)
+Dspeak = mainT()
+self.label_7 = QMovie(&quot;./lib/gifloader.gif&quot;, QByteArray(), self)
+self.label_7.setCacheMode(QMovie.CacheAll)
+
+self.label_4.setMovie(self.label_7)
+self.label_7.start()
+self.ts = time.strftime(&quot;%A, %d %B&quot;)
+Dspeak.start()
+self.label.setPixmap(QPixmap(&quot;./lib/tuse.png&quot;))
+self.label_5.setText(&quot;&lt;font size=8 color=&#39;white&#39;&gt;&quot;+self.ts+&quot;&lt;/font&gt;&quot;)
+self.label_5.setFont(QFont(QFont(&#39;Acens&#39;,8)))
+
+app = QtWidgets.QApplication(sys.argv)
+main = Main()
+main.show()
+exit(app.exec_())
+main()
